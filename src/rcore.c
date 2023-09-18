@@ -6901,6 +6901,7 @@ static void *EventThread(void *arg)
 
                 if (event.code == ABS_MT_TRACKING_ID)
                 {
+                    printf("Tracking id for %d = %d\n", worker->touchSlot, event.value);
                     if ((event.value < 0) && (worker->touchSlot < MAX_TOUCH_POINTS))
                     {
                         // Touch has ended for this point
@@ -6966,10 +6967,9 @@ static void *EventThread(void *arg)
 
             // Update touch point count
             CORE.Input.Touch.pointCount = 0;
-            if (CORE.Input.Touch.position[0].x >= 0) CORE.Input.Touch.pointCount++;
-            if (CORE.Input.Touch.position[1].x >= 0) CORE.Input.Touch.pointCount++;
-            if (CORE.Input.Touch.position[2].x >= 0) CORE.Input.Touch.pointCount++;
-            if (CORE.Input.Touch.position[3].x >= 0) CORE.Input.Touch.pointCount++;
+
+            for(int iTp = 0; iTp < MAX_TOUCH_POINTS; iTp++)
+              if (CORE.Input.Touch.position[iTp].x >= 0) CORE.Input.Touch.pointCount++;
 
 #if defined(SUPPORT_GESTURES_SYSTEM)        // PLATFORM_DRM
             if (gestureUpdate)
@@ -6979,15 +6979,11 @@ static void *EventThread(void *arg)
                 gestureEvent.touchAction = touchAction;
                 gestureEvent.pointCount = CORE.Input.Touch.pointCount;
 
-                gestureEvent.pointId[0] = 0;
-                gestureEvent.pointId[1] = 1;
-                gestureEvent.pointId[2] = 2;
-                gestureEvent.pointId[3] = 3;
-
-                gestureEvent.position[0] = CORE.Input.Touch.position[0];
-                gestureEvent.position[1] = CORE.Input.Touch.position[1];
-                gestureEvent.position[2] = CORE.Input.Touch.position[2];
-                gestureEvent.position[3] = CORE.Input.Touch.position[3];
+                for(int iTp = 0; iTp < MAX_TOUCH_POINTS; iTp++)
+                {
+                  gestureEvent.pointId[iTp] = 0;
+                  gestureEvent.position[iTp] = CORE.Input.Touch.position[iTp];
+                }
 
                 ProcessGestureEvent(gestureEvent);
             }
