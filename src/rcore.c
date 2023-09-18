@@ -6901,7 +6901,6 @@ static void *EventThread(void *arg)
 
                 if (event.code == ABS_MT_TRACKING_ID)
                 {
-                    printf("Tracking id for %d = %d\n", worker->touchSlot, event.value);
                     if ((event.value < 0) && (worker->touchSlot < MAX_TOUCH_POINTS))
                     {
                         // Touch has ended for this point
