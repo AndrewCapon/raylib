@@ -6848,8 +6848,9 @@ static void *EventThread(void *arg)
                 if (event.code == REL_X)
                 {
                     CORE.Input.Mouse.currentPosition.x += event.value;
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)                    
                     CORE.Input.Touch.position[0].x = CORE.Input.Mouse.currentPosition.x;
-
+#endif
                     touchAction = 2;    // TOUCH_ACTION_MOVE
                     gestureUpdate = true;
                 }
@@ -6857,8 +6858,9 @@ static void *EventThread(void *arg)
                 if (event.code == REL_Y)
                 {
                     CORE.Input.Mouse.currentPosition.y += event.value;
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)                    
                     CORE.Input.Touch.position[0].y = CORE.Input.Mouse.currentPosition.y;
-
+#endif
                     touchAction = 2;    // TOUCH_ACTION_MOVE
                     gestureUpdate = true;
                 }
@@ -6873,8 +6875,9 @@ static void *EventThread(void *arg)
                 if (event.code == ABS_X)
                 {
                     CORE.Input.Mouse.currentPosition.x = (event.value - worker->absRange.x)*CORE.Window.screen.width/worker->absRange.width;    // Scale according to absRange
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)                    
                     CORE.Input.Touch.position[0].x = (event.value - worker->absRange.x)*CORE.Window.screen.width/worker->absRange.width;        // Scale according to absRange
-
+#endif
                     touchAction = 2;    // TOUCH_ACTION_MOVE
                     gestureUpdate = true;
                 }
@@ -6882,8 +6885,9 @@ static void *EventThread(void *arg)
                 if (event.code == ABS_Y)
                 {
                     CORE.Input.Mouse.currentPosition.y = (event.value - worker->absRange.y)*CORE.Window.screen.height/worker->absRange.height;  // Scale according to absRange
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)                    
                     CORE.Input.Touch.position[0].y = (event.value - worker->absRange.y)*CORE.Window.screen.height/worker->absRange.height;      // Scale according to absRange
-
+#endif
                     touchAction = 2;    // TOUCH_ACTION_MOVE
                     gestureUpdate = true;
                 }
@@ -6894,11 +6898,13 @@ static void *EventThread(void *arg)
                 if (event.code == ABS_MT_POSITION_X)
                 {
                     if (worker->touchSlot < MAX_TOUCH_POINTS) CORE.Input.Touch.position[worker->touchSlot].x = (event.value - worker->absRange.x)*CORE.Window.screen.width/worker->absRange.width;    // Scale according to absRange
+                    TraceLog(LOG_DEBUG, "ABS_MT_POSITION_X [%d] = %d, %f", worker->touchSlot, event.value, CORE.Input.Touch.position[worker->touchSlot].x);
                 }
 
                 if (event.code == ABS_MT_POSITION_Y)
                 {
                     if (worker->touchSlot < MAX_TOUCH_POINTS) CORE.Input.Touch.position[worker->touchSlot].y = (event.value - worker->absRange.y)*CORE.Window.screen.height/worker->absRange.height;  // Scale according to absRange
+                    TraceLog(LOG_DEBUG, "ABS_MT_POSITION_Y [%d] = %d, %f", worker->touchSlot, event.value, CORE.Input.Touch.position[worker->touchSlot].y);
                 }
 
                 if (event.code == ABS_MT_TRACKING_ID)
@@ -6986,7 +6992,6 @@ static void *EventThread(void *arg)
                     gestureEvent.pointId[i] = i;
                     gestureEvent.position[i] = CORE.Input.Touch.position[i];
                 }
-
                 ProcessGestureEvent(gestureEvent);
             }
 #endif

@@ -12,6 +12,7 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#include "pthread.h"
 
 #define MAX_GESTURE_STRINGS   20
 
@@ -23,7 +24,7 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenHeight = 480;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - input gestures");
 
@@ -38,6 +39,8 @@ int main(void)
 
     //SetGesturesEnabled(0b0000000000001001);   // Enable only some gestures to be detected
 
+    SetTraceLogLevel(LOG_DEBUG);
+
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
@@ -49,7 +52,7 @@ int main(void)
         lastGesture = currentGesture;
         currentGesture = GetGestureDetected();
         touchPosition = GetTouchPosition(0);
-
+        TraceLog(LOG_DEBUG, "[%p] Start Main Loop Gesture = %d", pthread_self(), currentGesture);
         if (CheckCollisionPointRec(touchPosition, touchArea) && (currentGesture != GESTURE_NONE))
         {
             if (currentGesture != lastGesture)

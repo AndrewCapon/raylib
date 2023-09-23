@@ -43,6 +43,8 @@
 #ifndef RGESTURES_H
 #define RGESTURES_H
 
+#include "pthread.h"
+
 #ifndef PI
     #define PI 3.14159265358979323846
 #endif
@@ -406,13 +408,15 @@ void ProcessGestureEvent(GestureEvent event)
     {
         // TODO: Process gesture events for more than two points
     }
+
+    TraceLog(LOG_DEBUG, "[%p] processGestureEvent() current = %d", pthread_self(), GESTURES.current);
 }
 
 // Update gestures detected (must be called every frame)
 void UpdateGestures(void)
 {
     // NOTE: Gestures are processed through system callbacks on touch events
-
+    TraceLog(LOG_DEBUG, "[%p] UpdateGestures()", pthread_self());
     // Detect GESTURE_HOLD
     if (((GESTURES.current == GESTURE_TAP) || (GESTURES.current == GESTURE_DOUBLETAP)) && (GESTURES.Touch.pointCount < 2))
     {

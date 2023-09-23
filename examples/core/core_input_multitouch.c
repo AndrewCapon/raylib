@@ -14,6 +14,7 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#include <stdio.h>
 
 #define MAX_TOUCH_POINTS 10
 
@@ -25,7 +26,7 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenHeight = 480;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - input multitouch");
 
@@ -33,6 +34,8 @@ int main(void)
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //---------------------------------------------------------------------------------------
+
+    SetTraceLogLevel(LOG_DEBUG);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -44,7 +47,7 @@ int main(void)
         // Clamp touch points available ( set the maximum touch points allowed )
         if(tCount > MAX_TOUCH_POINTS) tCount = MAX_TOUCH_POINTS;
         // Get touch points positions
-        for (int i = 0; i < tCount; ++i) touchPositions[i] = GetTouchPosition(i);
+        for (int i = 0; i < MAX_TOUCH_POINTS; ++i) touchPositions[i] = GetTouchPosition(i);
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -53,11 +56,13 @@ int main(void)
 
             ClearBackground(RAYWHITE);
             
-            for (int i = 0; i < tCount; ++i)
+            //TraceLog(LOG_DEBUG, "Touch Count = %d", tCount);
+            for (int i = 0; i < MAX_TOUCH_POINTS; ++i)
             {
                 // Make sure point is not (0, 0) as this means there is no touch for it
                 if ((touchPositions[i].x > 0) && (touchPositions[i].y > 0))
                 {
+                    TraceLog(LOG_DEBUG, "Touch[%d] = %f, %f", i, touchPositions[i].x, touchPositions[i].y);
                     // Draw circle and touch index number
                     DrawCircleV(touchPositions[i], 34, ORANGE);
                     DrawText(TextFormat("%d", i), (int)touchPositions[i].x - 10, (int)touchPositions[i].y - 70, 40, BLACK);
