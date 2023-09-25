@@ -317,7 +317,7 @@
     #define MAX_GAMEPAD_BUTTONS           32        // Maximum number of buttons supported (per gamepad)
 #endif
 #ifndef MAX_TOUCH_POINTS
-    #define MAX_TOUCH_POINTS               8        // Maximum number of touch points supported
+    #define MAX_TOUCH_POINTS              10        // Maximum number of touch points supported
 #endif
 #ifndef MAX_KEY_PRESSED_QUEUE
     #define MAX_KEY_PRESSED_QUEUE         16        // Maximum number of keys in the key input queue
@@ -4231,6 +4231,16 @@ int GetTouchPointId(int index)
     return id;
 }
 
+bool GetTouchState(int index)
+{
+    int id = -1;
+
+    if (index < MAX_TOUCH_POINTS) id = CORE.Input.Touch.currentTouchState[index];
+
+    return id;
+}
+
+
 // Get number of touch points
 int GetTouchPointCount(void)
 {
@@ -6897,13 +6907,19 @@ static void *EventThread(void *arg)
 
                 if (event.code == ABS_MT_POSITION_X)
                 {
-                    if (worker->touchSlot < MAX_TOUCH_POINTS) CORE.Input.Touch.position[worker->touchSlot].x = (event.value - worker->absRange.x)*CORE.Window.screen.width/worker->absRange.width;    // Scale according to absRange
+                    if (worker->touchSlot < MAX_TOUCH_POINTS) {
+                      CORE.Input.Touch.position[worker->touchSlot].x = (event.value - worker->absRange.x)*CORE.Window.screen.width/worker->absRange.width;    // Scale according to absRange
+                      CORE.Input.Touch.currentTouchState[worker->touchSlot] = 1;
+                    }
                     TraceLog(LOG_DEBUG, "ABS_MT_POSITION_X [%d] = %d, %f", worker->touchSlot, event.value, CORE.Input.Touch.position[worker->touchSlot].x);
                 }
 
                 if (event.code == ABS_MT_POSITION_Y)
                 {
-                    if (worker->touchSlot < MAX_TOUCH_POINTS) CORE.Input.Touch.position[worker->touchSlot].y = (event.value - worker->absRange.y)*CORE.Window.screen.height/worker->absRange.height;  // Scale according to absRange
+                    if (worker->touchSlot < MAX_TOUCH_POINTS) {
+                      CORE.Input.Touch.position[worker->touchSlot].y = (event.value - worker->absRange.y)*CORE.Window.screen.height/worker->absRange.height;  // Scale according to absRange
+                      CORE.Input.Touch.currentTouchState[worker->touchSlot] = 1;
+                    }
                     TraceLog(LOG_DEBUG, "ABS_MT_POSITION_Y [%d] = %d, %f", worker->touchSlot, event.value, CORE.Input.Touch.position[worker->touchSlot].y);
                 }
 
@@ -6912,8 +6928,9 @@ static void *EventThread(void *arg)
                     if ((event.value < 0) && (worker->touchSlot < MAX_TOUCH_POINTS))
                     {
                         // Touch has ended for this point
-                        CORE.Input.Touch.position[worker->touchSlot].x = -1;
-                        CORE.Input.Touch.position[worker->touchSlot].y = -1;
+                        CORE.Input.Touch.currentTouchState[worker->touchSlot] = 0;
+                        // CORE.Input.Touch.position[worker->touchSlot].x = -1;
+                        // CORE.Input.Touch.position[worker->touchSlot].y = -1;
                     }
                 }
 
